@@ -16,8 +16,13 @@ async function createDb(): Promise<Db> {
   if (url) {
     const { default: postgres } = await import("postgres");
     const { drizzle } = await import("drizzle-orm/postgres-js");
-    const client = postgres(url, { max: 10 });
+    // prepare: false -> compatível com poolers em modo transação (Neon, Supabase).
+    const client = postgres(url, { max: 10, prepare: false });
     return drizzle(client, { schema });
+  }
+
+  if (process.env.VERCEL) {
+    throw new Error("DATABASE_URL não configurada. Conecte um Postgres (ex.: Neon) ao projeto na Vercel.");
   }
 
   const { PGlite } = await import("@electric-sql/pglite");

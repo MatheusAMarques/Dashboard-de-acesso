@@ -43,7 +43,8 @@ export function AuthForm({ mode, next }: { mode: Mode; next: string }) {
         {isLogin ? "Acesse o dashboard de desenvolvimento." : "O primeiro cadastro vira admin."}
       </p>
 
-      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
+      {/* method="post": se o JavaScript não carregar, a senha nunca vai parar na URL. */}
+      <form method="post" onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
         {!isLogin && (
           <Field label="Nome" name="name" autoComplete="name" errors={fieldErrors.name} />
         )}
