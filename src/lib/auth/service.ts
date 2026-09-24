@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { and, count, eq, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { authEvents, sessions, users, type User } from "@/db/schema";
-import { REFRESH_TOKEN_TTL_SECONDS, signAccessToken } from "./tokens";
+import { assertJwtConfigured, REFRESH_TOKEN_TTL_SECONDS, signAccessToken } from "./tokens";
 
 const BCRYPT_ROUNDS = 11;
 
@@ -97,6 +97,7 @@ export async function register(
   input: { name: string; email: string; password: string },
   client: ClientInfo,
 ): Promise<{ user: PublicUser; tokens: TokenPair }> {
+  assertJwtConfigured();
   const db = await getDb();
   const email = input.email.trim().toLowerCase();
 
@@ -130,9 +131,10 @@ export async function login(
   input: { email: string; password: string },
   client: ClientInfo,
 ): Promise<{ user: PublicUser; tokens: TokenPair }> {
+  assertJwtConfigured();
   const db = await getDb();
   const email = input.email.trim().toLowerCase();
-  const user = await db.query.users.findFirst({ where: eq(users.email, email) });
+  const user =await db.query.users.findFirst({ where: eq(users.email, email) });
 
   const ok = await bcrypt.compare(input.password, user?.passwordHash ?? DUMMY_HASH);
   if (!user || !ok) {

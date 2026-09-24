@@ -30,6 +30,11 @@ function getSecret(): Uint8Array {
   return cachedKey;
 }
 
+// Falha cedo (antes de gravar algo no banco) se o segredo não estiver configurado.
+export function assertJwtConfigured() {
+  getSecret();
+}
+
 export async function signAccessToken(payload: AccessTokenPayload): Promise<string> {
   return new SignJWT({ sid: payload.sid, role: payload.role })
     .setProtectedHeader({ alg: "HS256" })
